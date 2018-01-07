@@ -21,18 +21,20 @@ public class Builder : MonoBehaviour
 
     void OnMouseDown()
     {
-        //      if (castleHealth.restarDiners(buildManager.GetDefensePrice()))
-        //     {
-        game.GetComponent<Game>().addTable(transform.position.x, transform.position.y);
-        //     }
-
-        Destroy(gameObject);
+        if (game.GetComponent<Game>().isPositionPosible(transform.position.x, transform.position.y))
+        {
+            game.GetComponent<Game>().addTable(transform.position.x, transform.position.y);
+            Destroy(gameObject);
+        }
     }
 
 
     void OnMouseEnter()
     {
-        rend.material.color = temporalColor;
+        if (game.GetComponent<Game>().isPositionPosible(transform.position.x, transform.position.y))
+        {
+            rend.material.color = temporalColor;
+        }
     }
 
     void OnMouseExit()
