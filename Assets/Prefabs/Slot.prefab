@@ -37,8 +37,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1115704679649814}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1, y: 0, z: 0}
-  m_LocalScale: {x: 0.79999995, y: 0.79999995, z: 0.79999995}
+  m_LocalPosition: {x: 2.333228, y: 0.42982113, z: 0.000000051238665}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -96,7 +96,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   temporalColor: {r: 0.75, g: 0.72931033, b: 0, a: 0}
-  aptColor: {r: 0.5661765, g: 0.5661765, b: 0.5661765, a: 0}
 --- !u!135 &135802807881626674
 SphereCollider:
   m_ObjectHideFlags: 1
