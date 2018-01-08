@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System;
 using UnityEngine.UI;
 
@@ -15,6 +14,7 @@ public class Game : MonoBehaviour
     private int[,] table = new int[51, 51];    //0 azul; 1 rojo
     private GameObject[,] tableSphere;
     private bool blueTurn;
+    private int offsetSpheres = 25;
 
     private void Start()
     {
@@ -26,7 +26,7 @@ public class Game : MonoBehaviour
                 table[i, j] = -1;
             }
         }
-        table[24, 24] = 2;
+        table[offsetSpheres, offsetSpheres] = 2;
         tableSphere = new GameObject[50, 50];
         finishedMenu.SetActive(false);
         Time.timeScale = 1f;
@@ -36,14 +36,14 @@ public class Game : MonoBehaviour
     {
         GameObject sphereToInstantiate;
 
-        if (blueTurn) table[Convert.ToInt32(x) + 24, Convert.ToInt32(y) + 24] = 0;
-        else table[Convert.ToInt32(x) + 24, Convert.ToInt32(y) + 24] = 1;
+        if (blueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
+        else table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 1;
 
         if (blueTurn) sphereToInstantiate = blueSphere;
         else sphereToInstantiate = redSphere;
-        tableSphere[Convert.ToInt32(x) + 24, Convert.ToInt32(y) + 24] = Instantiate(sphereToInstantiate, new Vector3(x, y, 0), transform.rotation);
+        tableSphere[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = Instantiate(sphereToInstantiate, new Vector3(x, y, 0), transform.rotation);
 
-        if (hasWon(Convert.ToInt32(x) + 24, Convert.ToInt32(y) + 24))
+        if (hasWon(Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres))
         {
             if (blueTurn) textGuanyador.SetText("BLUE PLAYER WINS");
             else textGuanyador.SetText("RED PLAYER WINS");
@@ -80,7 +80,7 @@ public class Game : MonoBehaviour
         else sameColor = 1;
         while (i < table.GetLength(1) && j < table.GetLength(1) && i >= 0 && j >=0 && !win)
         {
-     //       Debug.Log("TABLE["+(i - 24) + "]["+ (j - 24) + "]: "+table[i, j]);
+            //       Debug.Log("TABLE["+(i - offsetSpheres) + "]["+ (j - offsetSpheres) + "]: "+table[i, j]);
             if (table[i, j] == sameColor) contador++;
             else contador = 0;
             if (contador == 5)
@@ -116,8 +116,8 @@ public class Game : MonoBehaviour
     public bool isPositionPosible(float x, float y)
     {
         
-        int posX = Convert.ToInt32(x) + 24;
-        int posY = Convert.ToInt32(y) + 24;
+        int posX = Convert.ToInt32(x) + offsetSpheres;
+        int posY = Convert.ToInt32(y) + offsetSpheres;
         bool isPosible = false;
 
         if (table[posX + 1, posY] != -1 ) isPosible = true;
