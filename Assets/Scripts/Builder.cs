@@ -3,14 +3,11 @@ using UnityEngine.EventSystems;
 
 public class Builder : MonoBehaviour
 {
-
-    public Color hoverColor;
     public Color temporalColor;
 
     private GameObject game;
     private Color initialColor;
     private Renderer rend;
-    private GameObject defense;
 
     void Start()
     {

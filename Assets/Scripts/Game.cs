@@ -9,8 +9,11 @@ public class Game : MonoBehaviour
     public GameObject turnColorImage;
     public Color blueColorImage;
     public Color redColorImage;
+    public TMPro.TextMeshProUGUI textGuanyador;
+    public GameObject finishedMenu;
 
     private int[,] table = new int[51, 51];    //0 azul; 1 rojo
+    private GameObject[,] tableSphere;
     private bool blueTurn;
 
     private void Start()
@@ -24,6 +27,9 @@ public class Game : MonoBehaviour
             }
         }
         table[24, 24] = 2;
+        tableSphere = new GameObject[50, 50];
+        finishedMenu.SetActive(false);
+        Time.timeScale = 1f;
     }
 
     public void addTable(float x, float y)
@@ -35,15 +41,62 @@ public class Game : MonoBehaviour
 
         if (blueTurn) sphereToInstantiate = blueSphere;
         else sphereToInstantiate = redSphere;
-        Instantiate(sphereToInstantiate, new Vector3(x, y, 0), transform.rotation);
-        Debug.Log("x: " + x + "y: " + y);
+        tableSphere[Convert.ToInt32(x) + 24, Convert.ToInt32(y) + 24] = Instantiate(sphereToInstantiate, new Vector3(x, y, 0), transform.rotation);
 
-        changeTurn();
+        if (hasWon(Convert.ToInt32(x) + 24, Convert.ToInt32(y) + 24))
+        {
+            if (blueTurn) textGuanyador.SetText("BLUE PLAYER WINS");
+            else textGuanyador.SetText("RED PLAYER WINS");
+            textGuanyador.gameObject.SetActive(true);
+            Time.timeScale = 0f;
+            finishedMenu.SetActive(true);
+        } else changeTurn();
     }
 
-    private bool isBlueTurn()
+    private bool hasWon(int x, int y)
     {
-        return blueTurn;
+        if (lookLine(x, y, 0, 1)) return true;
+        else if (lookLine(x, y, 1, 1)) return true;
+        else if (lookLine(x, y, 1, 0)) return true;
+        else if (lookLine(x, y, -1, 1)) return true;
+        else return false;
+    }
+
+    private bool lookLine(int x, int y, int incX, int incY)
+    {
+        bool win = false;
+        int sameColor;
+        int contador = 0;
+        
+        //trobar inici fila i/o columna
+        int i = x, j = y;
+        while (i > 0 && i < table.GetLength(1)-1 && j > 0 && j < table.GetLength(1)-1)
+        {
+            i -= incX;
+            j -= incY;
+        }
+
+        if (blueTurn) sameColor = 0;
+        else sameColor = 1;
+        while (i < table.GetLength(1) && j < table.GetLength(1) && i >= 0 && j >=0 && !win)
+        {
+     //       Debug.Log("TABLE["+(i - 24) + "]["+ (j - 24) + "]: "+table[i, j]);
+            if (table[i, j] == sameColor) contador++;
+            else contador = 0;
+            if (contador == 5)
+            {
+                win = true;
+                for (int k=0; k<5; k++)
+                {
+                    tableSphere[i, j].GetComponent<Renderer>().material.color = Color.yellow;
+                    i -= incX;
+                    j -= incY;
+                }
+            }
+            i += incX;
+            j += incY;
+        }
+        return win;
     }
 
     private void changeTurn()
@@ -76,8 +129,11 @@ public class Game : MonoBehaviour
         else if (table[posX + 1, posY - 1] != -1) isPosible = true;
         else if (table[posX - 1, posY - 1] != -1) isPosible = true;
 
-        Debug.Log("posX:" +posX+"posY:"+posY+"   "+isPosible);
-
         return isPosible;
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 }
