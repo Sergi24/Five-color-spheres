@@ -39,6 +39,8 @@ GameObject:
   - component: {fileID: 135881226021242488}
   - component: {fileID: 23175020137622320}
   - component: {fileID: 82361699272260438}
+  - component: {fileID: 114807886575742756}
+  - component: {fileID: 114119795513932280}
   m_Layer: 0
   m_Name: RedSphere
   m_TagString: Untagged
@@ -230,6 +232,59 @@ Light:
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &114119795513932280
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1653295007706996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 1
+  m_SendInterval: 0.1
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
+--- !u!114 &114807886575742756
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1653295007706996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 77
+    i1: 161
+    i2: 217
+    i3: 157
+    i4: 228
+    i5: 201
+    i6: 27
+    i7: 164
+    i8: 185
+    i9: 156
+    i10: 73
+    i11: 174
+    i12: 44
+    i13: 59
+    i14: 222
+    i15: 4
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!135 &135881226021242488
 SphereCollider:
   m_ObjectHideFlags: 1

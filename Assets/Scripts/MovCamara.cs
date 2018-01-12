@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class MovCamara : MonoBehaviour {
 
@@ -14,6 +15,7 @@ public class MovCamara : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+
         if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) && transform.position.y < limitDalt) transform.Translate(Vector3.up * Time.deltaTime * velocitatCamara);
         else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) && transform.position.y > limitBaix) transform.Translate(Vector3.down * Time.deltaTime * velocitatCamara);
         if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && transform.position.x > limitEsquerra) transform.Translate(Vector3.left * Time.deltaTime * velocitatCamara);
@@ -26,9 +28,10 @@ public class MovCamara : MonoBehaviour {
 
         //    if (Input.GetKey(KeyCode.Q) && transform.position.z > limitEndarrera) //transform.Translate(Vector3.back * Time.deltaTime * velocitatCamara);
         //else if (Input.GetKey(KeyCode.E) && transform.position.z < limitEndavant) transform.Translate(Vector3.forward * Time.deltaTime * velocitatCamara);
-        if (Input.GetKey(KeyCode.Q) && gameObject.GetComponent<Camera>().orthographicSize < 14)
-            gameObject.GetComponent<Camera>().orthographicSize += 0.1f;
-        else if (Input.GetKey(KeyCode.E) && gameObject.GetComponent<Camera>().orthographicSize > 4)
-            gameObject.GetComponent<Camera>().orthographicSize -= 0.1f;
+    //    if (Input.GetKey(KeyCode.Q) && gameObject.GetComponent<Camera>().orthographicSize < 14)
+    //        gameObject.GetComponent<Camera>().orthographicSize += 0.1f;
+     //   else if (Input.GetKey(KeyCode.E) && gameObject.GetComponent<Camera>().orthographicSize > 4)
+    //        gameObject.GetComponent<Camera>().orthographicSize -= 0.1f;
+         //   NetworkServer.Spawn(GameObject.Find("Slot"));
     }
 }

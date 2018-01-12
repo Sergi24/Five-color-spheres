@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class Game : MonoBehaviour
+public class Game : NetworkBehaviour
 {
     public GameObject blueSphere, redSphere;
     public GameObject turnColorImage;
@@ -12,9 +13,12 @@ public class Game : MonoBehaviour
     public GameObject finishedMenu;
 
     private int[,] table = new int[51, 51];    //0 azul; 1 rojo
+
     private GameObject[,] tableSphere;
+    [SyncVar]
     private bool blueTurn;
     private int offsetSpheres = 25;
+
 
     private void Start()
     {
@@ -30,18 +34,46 @@ public class Game : MonoBehaviour
         tableSphere = new GameObject[50, 50];
         finishedMenu.SetActive(false);
         Time.timeScale = 1f;
+
+  //      sphereHasBeenCreated = false;
     }
 
-    public void addTable(float x, float y)
+    private void Update()
+    {
+    /*    if (isClient)
+        {
+            Debug.Log("CLIENT POSX:" + posX);
+            Debug.Log("CLIENT POSY:" + posY);
+        }
+        if (!isServer) return;
+        Debug.Log("SERVER POSX:"+ posX);
+        Debug.Log("SERVER POSY:" + posY);
+        Debug.Log("SERVER sphereHasBeenCreated:" + sphereHasBeenCreated);
+
+        if (sphereHasBeenCreated)
+        {
+            Debug.Log("DINS, ADD TABLE");
+            sphereHasBeenCreated = false;
+            addTable(posX, posY);
+        }
+       */
+    }
+
+    public void addTable(float x, float y, GameObject sphere)
     {
         GameObject sphereToInstantiate;
+
+        Destroy(sphere);
 
         if (blueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
         else table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 1;
 
         if (blueTurn) sphereToInstantiate = blueSphere;
         else sphereToInstantiate = redSphere;
-        tableSphere[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = Instantiate(sphereToInstantiate, new Vector3(x, y, 0), transform.rotation);
+        tableSphere[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = Instantiate(sphereToInstantiate, new Vector3(x, y, 6.43f), transform.rotation);
+        NetworkServer.Spawn(tableSphere[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres]);
+
+        RpcAddTable(x, y, sphere);
 
         if (hasWon(Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres))
         {
@@ -51,6 +83,13 @@ public class Game : MonoBehaviour
             Time.timeScale = 0f;
             finishedMenu.SetActive(true);
         } else changeTurn();
+    }
+
+    [ClientRpc]
+    private void RpcAddTable(float x, float y, GameObject sphere)
+    {
+        if (blueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
+        else table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 1;
     }
 
     private bool hasWon(int x, int y)
@@ -111,6 +150,14 @@ public class Game : MonoBehaviour
             blueTurn = true;
             turnColorImage.GetComponent<Image>().color = blueColorImage;
         }
+    }
+
+    public bool isMyTurn(int numPlayer)
+    {
+        Debug.Log("blueTurn: " + blueTurn);
+        if (numPlayer == 1 && blueTurn) return true;
+        else if (numPlayer == 2 && !blueTurn) return true;
+        else return false;
     }
 
     public bool isPositionPosible(float x, float y)
