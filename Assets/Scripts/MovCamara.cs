@@ -21,14 +21,14 @@ public class MovCamara : MonoBehaviour {
         if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && transform.position.x > limitEsquerra) transform.Translate(Vector3.left * Time.deltaTime * velocitatCamara);
         else if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && transform.position.x < limitDreta) transform.Translate(Vector3.right * Time.deltaTime * velocitatCamara);
 
-        if (Input.GetAxis("Mouse ScrollWheel") > 0f && transform.position.z < limitEndavant) // forward
-            transform.position = new Vector3 (transform.position.x, transform.position.y, transform.position.z + velocitatCamara * .08f);
-        else if (Input.GetAxis("Mouse ScrollWheel") < 0f && transform.position.z > limitEndarrera) // backward
-            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - velocitatCamara * .08f);
+        if (Input.GetAxis("Mouse ScrollWheel") < 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize < 14) // forward
+            gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.5f;
+        else if (Input.GetAxis("Mouse ScrollWheel") > 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize > 4) // backward
+            gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.5f;
 
-        //    if (Input.GetKey(KeyCode.Q) && transform.position.z > limitEndarrera) //transform.Translate(Vector3.back * Time.deltaTime * velocitatCamara);
-        //else if (Input.GetKey(KeyCode.E) && transform.position.z < limitEndavant) transform.Translate(Vector3.forward * Time.deltaTime * velocitatCamara);
-   
+        //    if (Input.GetAxis("Mouse ScrollWheel") > 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize < 14) gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.01f;
+        //    else if (Input.GetAxis("Mouse ScrollWheel") < 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize > 4) gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.01f;
+
         if (Input.GetKey(KeyCode.Q) && gameObject.GetComponentInChildren<Camera>().orthographicSize < 14)
             gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.1f;
         else if (Input.GetKey(KeyCode.E) && gameObject.GetComponentInChildren<Camera>().orthographicSize > 4)

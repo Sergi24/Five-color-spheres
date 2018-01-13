@@ -24,6 +24,7 @@ public class Player : NetworkBehaviour {
             //CmdIncrementarNumPlayers();
             numPlayer = GameObject.FindGameObjectsWithTag("Player").Length;
             Debug.Log("NumJugador: " + numPlayer);
+            game.GetComponent<Game>().setNumPlayer(numPlayer);
         }
         if (!isLocalPlayer) gameObject.GetComponentInChildren<AudioListener>().enabled=false;
     }
@@ -44,7 +45,7 @@ public class Player : NetworkBehaviour {
             {
                 if (game.GetComponent<Game>().isMyTurn(numPlayer) && GameObject.FindGameObjectsWithTag("Player").Length>1)
                 {
-                    CmdAddTable(posX, posY, sphereChoosed);
+                    CmdAddTable(posX, posY, sphereChoosed, numPlayer);
                 }
             }
             sphereHasBeenCreated = false;
@@ -52,8 +53,8 @@ public class Player : NetworkBehaviour {
     }
 
     [Command]
-    private void CmdAddTable(float posX, float posY, GameObject sphere)
+    private void CmdAddTable(float posX, float posY, GameObject sphere, int numPlayer)
     {
-        game.GetComponent<Game>().addTable(posX, posY, sphere);
+        game.GetComponent<Game>().addTable(posX, posY, sphere, numPlayer);
     }
 }
