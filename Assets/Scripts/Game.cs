@@ -7,6 +7,7 @@ public class Game : NetworkBehaviour
 {
     public GameObject blueSphere, redSphere;
     public GameObject turnColorImage;
+    public GameObject textYourTurn;
     public Color blueColorImage;
     public Color redColorImage;
     public TMPro.TextMeshProUGUI textGuanyador;
@@ -43,6 +44,7 @@ public class Game : NetworkBehaviour
     public void setNumPlayer(int numPlayer)
     {
         this.numPlayer = numPlayer;
+        if (numPlayer == 1) textYourTurn.SetActive(true);
     }
 
     public void addTable(float x, float y, GameObject sphere, int numPlayer)
@@ -178,10 +180,14 @@ public class Game : NetworkBehaviour
         if (isBlueTurn)
         {
             turnColorImage.GetComponent<Image>().color = redColorImage;
+            if (numPlayer==2) textYourTurn.SetActive(true);
+            else textYourTurn.SetActive(false);
         }
         else
         {
             turnColorImage.GetComponent<Image>().color = blueColorImage;
+            if (numPlayer == 1) textYourTurn.SetActive(true);
+            else textYourTurn.SetActive(false);
         }
     }
 
