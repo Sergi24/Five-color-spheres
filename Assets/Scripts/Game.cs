@@ -22,7 +22,10 @@ public class Game : NetworkBehaviour
 
     private void Start()
     {
-        blueTurn = true;
+        if (isServer) blueTurn = true;
+
+        if (blueTurn) turnColorImage.GetComponent<Image>().color = blueColorImage;
+        else turnColorImage.GetComponent<Image>().color = redColorImage;
         for (int i=0; i<table.GetLength(1); i++)
         {
             for (int j = 0; j <table.GetLength(1); j++)
@@ -34,29 +37,6 @@ public class Game : NetworkBehaviour
         tableSphere = new GameObject[50, 50];
         finishedMenu.SetActive(false);
         Time.timeScale = 1f;
-
-  //      sphereHasBeenCreated = false;
-    }
-
-    private void Update()
-    {
-    /*    if (isClient)
-        {
-            Debug.Log("CLIENT POSX:" + posX);
-            Debug.Log("CLIENT POSY:" + posY);
-        }
-        if (!isServer) return;
-        Debug.Log("SERVER POSX:"+ posX);
-        Debug.Log("SERVER POSY:" + posY);
-        Debug.Log("SERVER sphereHasBeenCreated:" + sphereHasBeenCreated);
-
-        if (sphereHasBeenCreated)
-        {
-            Debug.Log("DINS, ADD TABLE");
-            sphereHasBeenCreated = false;
-            addTable(posX, posY);
-        }
-       */
     }
 
     public void addTable(float x, float y, GameObject sphere)
@@ -73,7 +53,7 @@ public class Game : NetworkBehaviour
         tableSphere[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = Instantiate(sphereToInstantiate, new Vector3(x, y, 6.43f), transform.rotation);
         NetworkServer.Spawn(tableSphere[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres]);
 
-        RpcAddTable(x, y, sphere);
+        RpcAddTable(x, y, blueTurn);
 
         if (hasWon(Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres))
         {
@@ -82,13 +62,14 @@ public class Game : NetworkBehaviour
             textGuanyador.gameObject.SetActive(true);
             Time.timeScale = 0f;
             finishedMenu.SetActive(true);
-        } else changeTurn();
+        } else changeTurn(blueTurn);
     }
 
     [ClientRpc]
-    private void RpcAddTable(float x, float y, GameObject sphere)
+    private void RpcAddTable(float x, float y, bool isBlueTurn)
     {
-        if (blueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
+        Debug.Log("ClientRpc: x:" + Convert.ToInt32(x) + ", y:" + Convert.ToInt32(y)+ " BlueTurn: " + isBlueTurn);
+        if (isBlueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
         else table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 1;
     }
 
@@ -138,23 +119,29 @@ public class Game : NetworkBehaviour
         return win;
     }
 
-    private void changeTurn()
+    private void changeTurn(bool isBlueTurn)
     {
-        if (blueTurn)
+        RpcChangeTurn(isBlueTurn);
+
+        if (isBlueTurn) blueTurn = false;
+        else blueTurn = true;
+    }
+
+    [ClientRpc]
+    private void RpcChangeTurn(bool isBlueTurn)
+    {
+        if (isBlueTurn)
         {
-            blueTurn = false;
             turnColorImage.GetComponent<Image>().color = redColorImage;
         }
         else
         {
-            blueTurn = true;
             turnColorImage.GetComponent<Image>().color = blueColorImage;
         }
     }
 
     public bool isMyTurn(int numPlayer)
     {
-        Debug.Log("blueTurn: " + blueTurn);
         if (numPlayer == 1 && blueTurn) return true;
         else if (numPlayer == 2 && !blueTurn) return true;
         else return false;
@@ -162,9 +149,9 @@ public class Game : NetworkBehaviour
 
     public bool isPositionPosible(float x, float y)
     {
-        
         int posX = Convert.ToInt32(x) + offsetSpheres;
         int posY = Convert.ToInt32(y) + offsetSpheres;
+        Debug.Log("posX: " + posX + "posY: " + posY);
         bool isPosible = false;
 
         if (table[posX + 1, posY] != -1 ) isPosible = true;
