@@ -28,10 +28,10 @@ public class MovCamara : MonoBehaviour {
 
         //    if (Input.GetKey(KeyCode.Q) && transform.position.z > limitEndarrera) //transform.Translate(Vector3.back * Time.deltaTime * velocitatCamara);
         //else if (Input.GetKey(KeyCode.E) && transform.position.z < limitEndavant) transform.Translate(Vector3.forward * Time.deltaTime * velocitatCamara);
-    //    if (Input.GetKey(KeyCode.Q) && gameObject.GetComponent<Camera>().orthographicSize < 14)
-    //        gameObject.GetComponent<Camera>().orthographicSize += 0.1f;
-     //   else if (Input.GetKey(KeyCode.E) && gameObject.GetComponent<Camera>().orthographicSize > 4)
-    //        gameObject.GetComponent<Camera>().orthographicSize -= 0.1f;
-         //   NetworkServer.Spawn(GameObject.Find("Slot"));
+   
+        if (Input.GetKey(KeyCode.Q) && gameObject.GetComponentInChildren<Camera>().orthographicSize < 14)
+            gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.1f;
+        else if (Input.GetKey(KeyCode.E) && gameObject.GetComponentInChildren<Camera>().orthographicSize > 4)
+            gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.1f;
     }
 }

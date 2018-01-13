@@ -10,18 +10,16 @@ public class Builder : NetworkBehaviour
 
     private Color initialColor;
     private Renderer rend;
-    private GameObject game;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
         initialColor = rend.material.color;
-        game = GameObject.Find("Game");
     }
 
     void OnMouseDown()
     {
-        if (game.GetComponent<Game>().isPositionPosible(transform.position.x, transform.position.y))
+        if (GameObject.Find("Game").GetComponent<Game>().isPositionPosible(transform.position.x, transform.position.y))
         {
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
@@ -35,9 +33,14 @@ public class Builder : NetworkBehaviour
 
     void OnMouseEnter()
     {
-        if (game.GetComponent<Game>().isPositionPosible(transform.position.x, transform.position.y))
+        if (GameObject.Find("Game").GetComponent<Game>().isPositionPosible(transform.position.x, transform.position.y))
         {
+            Debug.Log("PossibleTRUE");
             rend.material.color = temporalColor;
+        }
+        else
+        {
+            Debug.Log("PossibleFALSE");
         }
     }
 

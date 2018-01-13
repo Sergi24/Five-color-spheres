@@ -45,8 +45,8 @@ public class Game : NetworkBehaviour
 
         Destroy(sphere);
 
-        if (blueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
-        else table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 1;
+   //     if (blueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
+  //      else table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 1;
 
         if (blueTurn) sphereToInstantiate = blueSphere;
         else sphereToInstantiate = redSphere;
@@ -57,11 +57,7 @@ public class Game : NetworkBehaviour
 
         if (hasWon(Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres))
         {
-            if (blueTurn) textGuanyador.SetText("BLUE PLAYER WINS");
-            else textGuanyador.SetText("RED PLAYER WINS");
-            textGuanyador.gameObject.SetActive(true);
-            Time.timeScale = 0f;
-            finishedMenu.SetActive(true);
+            RpcPlayerHasWon(blueTurn);
         } else changeTurn(blueTurn);
     }
 
@@ -71,6 +67,16 @@ public class Game : NetworkBehaviour
         Debug.Log("ClientRpc: x:" + Convert.ToInt32(x) + ", y:" + Convert.ToInt32(y)+ " BlueTurn: " + isBlueTurn);
         if (isBlueTurn) table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 0;
         else table[Convert.ToInt32(x) + offsetSpheres, Convert.ToInt32(y) + offsetSpheres] = 1;
+    }
+
+    [ClientRpc]
+    private void RpcPlayerHasWon(bool isBlueTurn)
+    {
+        if (isBlueTurn) textGuanyador.SetText("BLUE PLAYER WINS");
+        else textGuanyador.SetText("RED PLAYER WINS");
+        textGuanyador.gameObject.SetActive(true);
+        Time.timeScale = 0f;
+        finishedMenu.SetActive(true);
     }
 
     private bool hasWon(int x, int y)
