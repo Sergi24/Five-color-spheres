@@ -2,12 +2,14 @@
 using System;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Game : NetworkBehaviour
 {
     public GameObject blueSphere, redSphere;
     public GameObject turnColorImage;
     public GameObject textYourTurn;
+    public GameObject finishedRestart;
     public Color blueColorImage;
     public Color redColorImage;
     public TMPro.TextMeshProUGUI textGuanyador;
@@ -110,6 +112,7 @@ public class Game : NetworkBehaviour
         if (isBlueTurn) textGuanyador.SetText("BLUE PLAYER WINS");
         else textGuanyador.SetText("RED PLAYER WINS");
         textGuanyador.gameObject.SetActive(true);
+        if (numPlayer!=1) finishedRestart.gameObject.SetActive(false);
         Time.timeScale = 0f;
         finishedMenu.SetActive(true);
     }
@@ -216,8 +219,15 @@ public class Game : NetworkBehaviour
         return isPosible;
     }
 
-    public void Quit()
+
+    public void Restart()
     {
-        Application.Quit();
+        RpcRestart();
+    }
+
+    [ClientRpc]
+    private void RpcRestart()
+    {
+        SceneManager.LoadSceneAsync("Joc");
     }
 }

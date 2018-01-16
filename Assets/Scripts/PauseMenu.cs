@@ -36,9 +36,4 @@ public class PauseMenu : MonoBehaviour {
     public void Quit() {
         Application.Quit();
     }
-
-    public void Restart()
-    {
-        SceneManager.LoadSceneAsync("Joc");
-    }
 }
