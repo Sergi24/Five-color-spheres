@@ -11,21 +11,26 @@ public class PauseMenu : MonoBehaviour {
         PauseMenuPanel.SetActive(false);
     }
 
-    void Update () {
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            if(GameIsPaused) {
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            if (GameIsPaused) {
                 Resume();
             }
             else {
                 Pause();
             }
         }
-	}
+    }
 
     void Pause() {
         PauseMenuPanel.SetActive(true);
-        Time.timeScale= 0f;
+        Time.timeScale = 0f;
         GameIsPaused = true;
+    }
+
+    public void Restart()
+    { 
+        SceneManager.LoadSceneAsync("JocVsIa");
     }
 
     public void Resume() {

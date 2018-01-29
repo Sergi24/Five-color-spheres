@@ -136,7 +136,7 @@ public class GameVsIa : MonoBehaviour
     {
         for (int k = 0; k < 5; k++)
         {
-            Debug.Log("TABLE[" + (i - offsetSpheres) + "][" + (j - offsetSpheres) + "]: " + table[i, j]);
+        //    Debug.Log("TABLE[" + (i - offsetSpheres) + "][" + (j - offsetSpheres) + "]: " + table[i, j]);
             tableSphere[i, j].GetComponent<Renderer>().material.color = Color.yellow;
             i -= incX;
             j -= incY;
@@ -149,12 +149,14 @@ public class GameVsIa : MonoBehaviour
         {
             blueTurn = false;
             turnColorImage.GetComponent<Image>().color = redColorImage;
+            textYourTurn.SetActive(false);
             Invoke("jugadaOrdinador", 0.2f);
         }
         else
         {
             blueTurn = true;
             turnColorImage.GetComponent<Image>().color = blueColorImage;
+            textYourTurn.SetActive(true);
         }
     }
 
@@ -278,7 +280,7 @@ public class GameVsIa : MonoBehaviour
                 }
                 i++;
             }
-            if (nivell == 0 && nodeARetornar.getValorHeuristica() == -1) Debug.Log("----GUANYARA SI O SI----");
+            //if (nivell == 0 && nodeARetornar.getValorHeuristica() == -1) Debug.Log("----GUANYARA SI O SI----");
             return nodeARetornar;
         }
     }
@@ -316,7 +318,7 @@ public class GameVsIa : MonoBehaviour
         sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 1, 1, nivell);
         sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 1, 0, nivell);
         sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), -1, 1, nivell);
-        Debug.Log("HEURISTICA("+(node.getUltimaTiradaX()-offsetSpheres)+")("+(node.getUltimaTiradaY()-offsetSpheres)+"): "+sumaHeuristica);
+     //   Debug.Log("HEURISTICA("+(node.getUltimaTiradaX()-offsetSpheres)+")("+(node.getUltimaTiradaY()-offsetSpheres)+"): "+sumaHeuristica);
         return 100000 + sumaHeuristica;
     }
 
@@ -364,8 +366,8 @@ public class GameVsIa : MonoBehaviour
 
     //    Debug.Log("CONTADOR: " + contador + " BLOQUEIG: " + bloqueig);
 
-        if (contador == 4 && bloqueig == 0) suma = 500;
-        else if (contador == 4 && bloqueig == 1) suma = 100;
+        if (contador == 4 && bloqueig == 0) suma = 750;
+        else if (contador == 4 && bloqueig == 1) suma = 500;
         else if (contador == 3 && bloqueig == 0) suma = 10;
         else if (contador == 3 && bloqueig == 1) suma = 5;
         else if (contador == 2 && bloqueig == 0) suma = 2;
@@ -443,31 +445,33 @@ public class GameVsIa : MonoBehaviour
     //        else if (table[i, j] == -1) contadorEspais++;
             else if (contador != 0)
             {
+                bool final = false;
+                contadorEspais = contador+1;
+                int contadorInicial = contador;
+
                 //bloqueig davant
                 if (table[i, j] != -1) bloqueig += 1;
                 else //jugades intermitjes
                 {
-                    bool final = false;
-                    contadorEspais = contador;
-                    int contadorInicial = contador;
                     while (!final && contadorEspais < 5)
                     {
-                        if (table[i + ((contadorEspais - contadorInicial) * incX), j + ((contadorEspais - contadorInicial) * incY)] == sameColor)
+                        if (table[i + ((contadorEspais - contadorInicial) * incX), j + ((contadorEspais - contadorInicial) * incY)] == sameColor) //nova esfera
                         {
                             contador++;
-                            Debug.Log("AQUI. contador++");
+                      //      Debug.Log("AQUI. contador++");
                         }
-                        else if (table[i + ((contadorEspais - contadorInicial) * incX), j + ((contadorEspais - contadorInicial) * incY)] != -1)
+                        else if (table[i + ((contadorEspais - contadorInicial) * incX), j + ((contadorEspais - contadorInicial) * incY)] != -1) //bloqueig
                         {
                             final = true;
                             bloqueig += 1;
                         }
-                        else contadorEspais++;
+                        else final = true; //segon espai en blanc
+                        contadorEspais++;
                     }
                 }
 
                 //bloqueig darrere
-                if (table[i - (incX * (contador + 1)), j - (incY * (contador + 1))] != -1) bloqueig += 1;
+                if (table[i - (incX * (contadorInicial + 1)), j - (incY * (contadorInicial + 1))] != -1) bloqueig += 1;
 
                 if (contador >= 4 && bloqueig == 0) suma += 1000;
                 else if (contador >= 4 && bloqueig == 1) suma += 1000;
