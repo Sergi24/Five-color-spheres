@@ -22,16 +22,20 @@ public class MovCamara : MonoBehaviour {
         else if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && transform.position.x < limitDreta) transform.Translate(Vector3.right * Time.deltaTime * velocitatCamara);
 
         if (Input.GetAxis("Mouse ScrollWheel") < 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize < 14) // forward
-            gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.5f;
+            if (gameObject.GetComponentInChildren<Camera>() != null)  gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.5f;
+            else gameObject.GetComponent<Camera>().orthographicSize += 0.5f;
         else if (Input.GetAxis("Mouse ScrollWheel") > 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize > 4) // backward
-            gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.5f;
+            if (gameObject.GetComponentInChildren<Camera>() != null) gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.5f;
+            else gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.5f;
 
         //    if (Input.GetAxis("Mouse ScrollWheel") > 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize < 14) gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.01f;
         //    else if (Input.GetAxis("Mouse ScrollWheel") < 0f && gameObject.GetComponentInChildren<Camera>().orthographicSize > 4) gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.01f;
 
         if (Input.GetKey(KeyCode.Q) && gameObject.GetComponentInChildren<Camera>().orthographicSize < 14)
-            gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.1f;
+            if (gameObject.GetComponentInChildren<Camera>()!=null) gameObject.GetComponentInChildren<Camera>().orthographicSize += 0.1f;
+            else gameObject.GetComponent<Camera>().orthographicSize += 0.1f;
         else if (Input.GetKey(KeyCode.E) && gameObject.GetComponentInChildren<Camera>().orthographicSize > 4)
-            gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.1f;
+            if (gameObject.GetComponentInChildren<Camera>() != null) gameObject.GetComponentInChildren<Camera>().orthographicSize -= 0.1f;
+            else gameObject.GetComponent<Camera>().orthographicSize -= 0.1f;
     }
 }

@@ -23,24 +23,25 @@ public class Game : NetworkBehaviour
     private int offsetSpheres = 25;
     private GameObject lastSphere;
 
-
     private void Start()
     {
-        if (isServer) blueTurn = true;
+        if (SceneManager.GetActiveScene().Equals("Joc")){
+            if (isServer) blueTurn = true;
 
-        if (blueTurn) turnColorImage.GetComponent<Image>().color = blueColorImage;
-        else turnColorImage.GetComponent<Image>().color = redColorImage;
-        for (int i=0; i<table.GetLength(1); i++)
-        {
-            for (int j = 0; j <table.GetLength(1); j++)
+            if (blueTurn) turnColorImage.GetComponent<Image>().color = blueColorImage;
+            else turnColorImage.GetComponent<Image>().color = redColorImage;
+            for (int i = 0; i < table.GetLength(1); i++)
             {
-                table[i, j] = -1;
+                for (int j = 0; j < table.GetLength(1); j++)
+                {
+                    table[i, j] = -1;
+                }
             }
+            table[offsetSpheres, offsetSpheres] = 2;
+            tableSphere = new GameObject[50, 50];
+            finishedMenu.SetActive(false);
+            Time.timeScale = 1f;
         }
-        table[offsetSpheres, offsetSpheres] = 2;
-        tableSphere = new GameObject[50, 50];
-        finishedMenu.SetActive(false);
-        Time.timeScale = 1f;
     }
 
     public void setNumPlayer(int numPlayer)

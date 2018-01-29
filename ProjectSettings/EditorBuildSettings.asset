@@ -11,3 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Joc.unity
     guid: b99725c47e446b949b419d929b739242
+  - enabled: 1
+    path: Assets/Scenes/JocVsIa.unity
+    guid: 39492b2902deecc4785a05e9fb64a2d5
