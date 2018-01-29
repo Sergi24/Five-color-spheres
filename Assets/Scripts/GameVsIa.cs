@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class GameVsIa : MonoBehaviour
 {
-    public GameObject blueSphere, redSphere;
+    public GameObject blueSphere, redSphere, blackSphere;
     public GameObject turnColorImage;
     public GameObject textYourTurn;
 
@@ -17,12 +17,15 @@ public class GameVsIa : MonoBehaviour
     public TMPro.TextMeshProUGUI textGuanyador;
     public GameObject finishedMenu;
 
-    private int[,] table = new int[51, 51];    //0 azul; 1 rojo
+    public int mapa;
+
+    private int[,] table;    //0 azul; 1 rojo
 
     private GameObject[,] tableSphere;
     private GameObject lastSphere;
     private bool blueTurn;
-    private int offsetSpheres = 25;
+    private bool primeraTiradaOrdinador;
+    private int offsetSpheres;
 
     private int NIVELL_MAX_ALFABETA = 1;
 
@@ -30,27 +33,46 @@ public class GameVsIa : MonoBehaviour
 
     private void Start()
     {
-        if (SceneManager.GetActiveScene().name.Equals("JocVsIa"))
+        blueTurn = true;
+        primeraTiradaOrdinador = true;
+        Time.timeScale = 1f;
+
+        mapa = gameObject.GetComponent<MapManager>().getMapa();
+
+        //MAPA0
+        table = new int[51, 51];
+        offsetSpheres = 25;
+        for (int i = 0; i < table.GetLength(1); i++)
         {
-            blueTurn = true;
+            for (int j = 0; j < table.GetLength(1); j++)
+            {
+                table[i, j] = -1;
+                if (mapa == 1 && ((i < 13 || i > 37) || (j < 13 || j > 37))) destroySlot(i, j);
+            }
+        }
+        table[offsetSpheres, offsetSpheres] = 2;
+        tableSphere = new GameObject[51, 51];
+        
+        //MAPA1
+        if (mapa == 1)
+        {
+            table = new int[27, 27];
+            offsetSpheres = 13;
             for (int i = 0; i < table.GetLength(1); i++)
             {
                 for (int j = 0; j < table.GetLength(1); j++)
                 {
-                    table[i, j] = -1;
+                    if ((i - 1) % 4 == 0 && (j - 1) % 4 == 0)
+                    {
+                        table[i, j] = 2;
+                        destroySlot(i, j);
+                        Instantiate(blackSphere, new Vector3(i - offsetSpheres, j - offsetSpheres, 0), transform.rotation);
+                    } else if (i==0||j==0||i==table.GetLength(1)-1 || j == table.GetLength(1) - 1) table[i, j] = 2;
+                    else table[i, j] = -1;
                 }
             }
-            table[offsetSpheres, offsetSpheres] = 2;
-            tableSphere = new GameObject[50, 50];
-            finishedMenu.SetActive(false);
-            Time.timeScale = 1f;
+            tableSphere = new GameObject[27, 27];
         }
-    }
-
-    public void OnePlayerMode()
-    {
-        GameObject.Find("NetworkManager").GetComponent<NetworkManagerHUD>().enabled = false;
-        SceneManager.LoadScene("JocVsIa");
     }
 
     public void addTable(float x, float y)
@@ -150,7 +172,11 @@ public class GameVsIa : MonoBehaviour
             blueTurn = false;
             turnColorImage.GetComponent<Image>().color = redColorImage;
             textYourTurn.SetActive(false);
-            Invoke("jugadaOrdinador", 0.2f);
+
+            int tempsAfegit = 0;
+            if (primeraTiradaOrdinador) tempsAfegit = 2;
+            if (mapa == 0) Invoke("jugadaOrdinador", 0.3f + tempsAfegit);
+            else if (mapa == 1) Invoke("jugadaOrdinador", 0.05f + tempsAfegit);
         }
         else
         {
@@ -167,7 +193,8 @@ public class GameVsIa : MonoBehaviour
         int posY = Convert.ToInt32(y) + offsetSpheres;
         bool isPosible = false;
 
-        if (!(x == 0 && y == 0) && (table[posX, posY]==-1))
+        //!(x == 0 && y == 0) && 
+        if (table[posX, posY]==-1)
         {
             //  Debug.Log("x: " + posX + "y: " + posY);
             if (table[posX + 1, posY] != -1) isPosible = true;
@@ -204,12 +231,19 @@ public class GameVsIa : MonoBehaviour
         Node node = alfaBeta(new Node(table, -1, -1), 0, -2, -1);
         addTable(node.getUltimaTiradaX()-offsetSpheres, node.getUltimaTiradaY()-offsetSpheres);
 
+        destroySlot(node.getUltimaTiradaX(), node.getUltimaTiradaY());
+        if (primeraTiradaOrdinador) primeraTiradaOrdinador = false;
+    }
+
+    private void destroySlot(int x, int y)
+    {
         GameObject[] slots = GameObject.FindGameObjectsWithTag("Slot");
         int i = 0;
         bool trobat = false;
         while (i < slots.Length && !trobat)
         {
-            if (Convert.ToInt32(slots[i].transform.position.x) == node.getUltimaTiradaX()-offsetSpheres && Convert.ToInt32(slots[i].transform.position.y) == node.getUltimaTiradaY()-offsetSpheres){
+            if (Convert.ToInt32(slots[i].transform.position.x) == x - offsetSpheres && Convert.ToInt32(slots[i].transform.position.y) == y - offsetSpheres)
+            {
                 trobat = true;
                 Destroy(slots[i]);
             }
@@ -223,20 +257,20 @@ public class GameVsIa : MonoBehaviour
 
         if (hasWon(node.getUltimaTiradaX(), node.getUltimaTiradaY(), node.getTable(), false))
         {
-            Debug.Log("HAS WON");
+        //    Debug.Log("HAS WON");
             if (nivell % 2 == 0) node.setValorHeuristica(-2);  //-2 el tractem com un +infinit
             else node.setValorHeuristica(-1);               //-1 el tractem com un -infinit
             return node;
         }
         else if (nivell == NIVELL_MAX_ALFABETA)
         {
-            Debug.Log("nivell==NIVELL_MAX_ALFABETA "+nivell);
+        //    Debug.Log("nivell==NIVELL_MAX_ALFABETA "+nivell);
             node.setValorHeuristica(calcularHeuristica(node, nivell));
             return node;
         }
         else
         {
-            Debug.Log("nivell: " + nivell);
+      //      Debug.Log("nivell: " + nivell);
             nodeARetornar = new Node(node.getTable(), -1, -1);
             if (nivell % 2 == 0) nodeARetornar.setValorHeuristica(-2);          //MIN
             else nodeARetornar.setValorHeuristica(-1);                          //MAX
@@ -311,15 +345,42 @@ public class GameVsIa : MonoBehaviour
     {
         int sumaHeuristica;
 
-        sumaHeuristica = playerCount(node);
+        if (!primeraTiradaOrdinador)
+        {
+            sumaHeuristica = playerCount(node);
 
-     //   Debug.Log("-----------------ULTIMA TIRADA X: " + (node.getUltimaTiradaX()) + " ULTIMA TIRADA Y: " + (node.getUltimaTiradaY()) + "-----------------");
-        sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 0, 1, nivell);
-        sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 1, 1, nivell);
-        sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 1, 0, nivell);
-        sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), -1, 1, nivell);
-     //   Debug.Log("HEURISTICA("+(node.getUltimaTiradaX()-offsetSpheres)+")("+(node.getUltimaTiradaY()-offsetSpheres)+"): "+sumaHeuristica);
+            //   Debug.Log("-----------------ULTIMA TIRADA X: " + (node.getUltimaTiradaX()) + " ULTIMA TIRADA Y: " + (node.getUltimaTiradaY()) + "-----------------");
+            sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 0, 1, nivell);
+            sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 1, 1, nivell);
+            sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), 1, 0, nivell);
+            sumaHeuristica += countOrientation(node, node.getUltimaTiradaX(), node.getUltimaTiradaY(), -1, 1, nivell);
+        }
+        else
+        {
+            sumaHeuristica = lookWhereIsPlayer(node.getTable(), node.getUltimaTiradaX(), node.getUltimaTiradaY());
+        }
+       // Debug.Log("HEURISTICA(" + (node.getUltimaTiradaX() - offsetSpheres) + ")(" + (node.getUltimaTiradaY() - offsetSpheres) + "): " + sumaHeuristica);
         return 100000 + sumaHeuristica;
+    }
+
+    private int lookWhereIsPlayer(int[,] table, int x, int y)
+    {
+        int posX = x;
+        int posY = y;
+        int suma = 0;
+
+        //!(x == 0 && y == 0) && 
+        //  Debug.Log("x: " + posX + "y: " + posY);
+        if (table[posX + 1, posY] == 0) suma = 1;
+        else if (table[posX - 1, posY] == 0) suma = 1;
+        else if (table[posX, posY + 1] == 0) suma = 1;
+        else if (table[posX, posY - 1] == 0) suma = 1;
+        else if (table[posX + 1, posY + 1] == 0) suma = 1;
+        else if (table[posX - 1, posY + 1] == 0) suma = 1;
+        else if (table[posX + 1, posY - 1] == 0) suma = 1;
+        else if (table[posX - 1, posY - 1] == 0) suma = 1;
+
+        return suma;
     }
 
     private int countOrientation(Node node, int x, int y, int incX, int incY, int nivell)
@@ -370,8 +431,9 @@ public class GameVsIa : MonoBehaviour
         else if (contador == 4 && bloqueig == 1) suma = 500;
         else if (contador == 3 && bloqueig == 0) suma = 10;
         else if (contador == 3 && bloqueig == 1) suma = 5;
-        else if (contador == 2 && bloqueig == 0) suma = 2;
+        else if (contador == 2 && bloqueig == 0) suma = 3;
         else if (contador == 2 && bloqueig == 1) suma = 1;
+        else if (contador == 1 && bloqueig == 1) suma = -1;
 
         return suma;
     }
@@ -381,10 +443,8 @@ public class GameVsIa : MonoBehaviour
         int suma = 0;
         for (int i = 0; i < table.GetLength(1); i++) {
             suma -= lookLineCountPlayer(0, i, 1, 0, node.getTable());
-        }
-        for (int j = 0; j < table.GetLength(1); j++)
-        {
-            suma -= lookLineCountPlayer(j, 0, 0, 1, node.getTable());
+
+            suma -= lookLineCountPlayer(i, 0, 0, 1, node.getTable());
         }
         //DIAGONALS
         //DALT DRETA
@@ -431,36 +491,35 @@ public class GameVsIa : MonoBehaviour
             i -= incX;
             j -= incY;
         }
-        if (incX == -1)
-        {
-       //     Debug.Log("TABLE[" + (i) + "][" + (j) + "]: " + table[i, j]);
-       //     Debug.Log("i inicial: " + i + " j inicial" + j);
-        }
+
         sameColor = 0;
         while (i < table.GetLength(1) && j < table.GetLength(1) && i >= 0 && j >= 0)
         {
             if (table[i, j] == sameColor) {
                 contador++;
+            //    Debug.Log("CONTADOR++ EN i: " + i + " j: " + j );
             }
     //        else if (table[i, j] == -1) contadorEspais++;
             else if (contador != 0)
             {
-                bool final = false;
+                bool final = false, pont = false;
                 contadorEspais = contador+1;
                 int contadorInicial = contador;
 
                 //bloqueig davant
                 if (table[i, j] != -1) bloqueig += 1;
-                else //jugades intermitjes
+                else //jugades intermitjes    [i, j]==-1
                 {
                     while (!final && contadorEspais < 5)
                     {
-                        if (table[i + ((contadorEspais - contadorInicial) * incX), j + ((contadorEspais - contadorInicial) * incY)] == sameColor) //nova esfera
+                        int nextPosition = table[i + ((contadorEspais - contadorInicial) * incX), j + ((contadorEspais - contadorInicial) * incY)];
+                        if (nextPosition == sameColor) //nova esfera
                         {
                             contador++;
+                            pont = true;
                       //      Debug.Log("AQUI. contador++");
                         }
-                        else if (table[i + ((contadorEspais - contadorInicial) * incX), j + ((contadorEspais - contadorInicial) * incY)] != -1) //bloqueig
+                        else if (nextPosition != -1 && pont) //bloqueig
                         {
                             final = true;
                             bloqueig += 1;
@@ -471,6 +530,7 @@ public class GameVsIa : MonoBehaviour
                 }
 
                 //bloqueig darrere
+            //    Debug.Log("TABLE[" + (i-incX) + "][" + (j-incY) + "]: " + table[i-incX, j-incY]);
                 if (table[i - (incX * (contadorInicial + 1)), j - (incY * (contadorInicial + 1))] != -1) bloqueig += 1;
 
                 if (contador >= 4 && bloqueig == 0) suma += 1000;

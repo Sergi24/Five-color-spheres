@@ -39,7 +39,7 @@ public class Node {
 
     public int[,] getTable()
     {
-        int [,] tableClone = new int[51, 51];
+        int [,] tableClone = new int[table.GetLength(1), table.GetLength(1)];
         for (int i = 0; i < table.GetLength(1); i++)
         {
             for (int j = 0; j < table.GetLength(1); j++)

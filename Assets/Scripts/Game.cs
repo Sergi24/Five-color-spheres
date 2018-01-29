@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Game : NetworkBehaviour
 {
-    public GameObject blueSphere, redSphere;
+    public GameObject blueSphere, redSphere, blackSphere;
     public GameObject turnColorImage;
     public GameObject textYourTurn;
     public GameObject finishedRestart;
@@ -23,9 +23,14 @@ public class Game : NetworkBehaviour
     private int offsetSpheres = 25;
     private GameObject lastSphere;
 
+    [SyncVar]
+    public int mapa;
+
     private void Start()
     {
         if (isServer) blueTurn = true;
+
+        if (isServer) mapa = gameObject.GetComponent<MapManager>().getMapa();
 
         if (blueTurn) turnColorImage.GetComponent<Image>().color = blueColorImage;
         else turnColorImage.GetComponent<Image>().color = redColorImage;
@@ -34,12 +39,50 @@ public class Game : NetworkBehaviour
             for (int j = 0; j <table.GetLength(1); j++)
             {
                 table[i, j] = -1;
+                if (mapa == 1 && ((i < 13 || i > 37) || (j < 13 || j > 37))) destroySlot(i, j);
             }
         }
         table[offsetSpheres, offsetSpheres] = 2;
-        tableSphere = new GameObject[50, 50];
-        finishedMenu.SetActive(false);
+        tableSphere = new GameObject[51, 51];
         Time.timeScale = 1f;
+
+        //MAPA1
+        if (mapa == 1)
+        {
+            table = new int[27, 27];
+            offsetSpheres = 13;
+            for (int i = 0; i < table.GetLength(1); i++)
+            {
+                for (int j = 0; j < table.GetLength(1); j++)
+                {
+                    if ((i - 1) % 4 == 0 && (j - 1) % 4 == 0)
+                    {
+                        table[i, j] = 2;
+                        destroySlot(i, j);
+                        Instantiate(blackSphere, new Vector3(i - offsetSpheres, j - offsetSpheres, 6.43f), transform.rotation);
+                    }
+                    else if (i == 0 || j == 0 || i == table.GetLength(1) - 1 || j == table.GetLength(1) - 1) table[i, j] = 2;
+                    else table[i, j] = -1;
+                }
+            }
+            tableSphere = new GameObject[27, 27];
+        }
+    }
+
+    private void destroySlot(int x, int y)
+    {
+        GameObject[] slots = GameObject.FindGameObjectsWithTag("Slot");
+        int i = 0;
+        bool trobat = false;
+        while (i < slots.Length && !trobat)
+        {
+            if (Convert.ToInt32(slots[i].transform.position.x) == x - offsetSpheres && Convert.ToInt32(slots[i].transform.position.y) == y - offsetSpheres)
+            {
+                trobat = true;
+                Destroy(slots[i]);
+            }
+            i++;
+        }
     }
 
     public void setNumPlayer(int numPlayer)
